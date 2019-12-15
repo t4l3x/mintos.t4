@@ -5,6 +5,7 @@ use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -14,6 +15,8 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Site controller
@@ -153,9 +156,15 @@ class SiteController extends Controller
     public function actionSignup()
     {
         $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
-            return $this->goHome();
+        if ($model->load(Yii::$app->request->post())) {
+            if(Yii::$app->request->isAjax){
+                $model->load(Yii::$app->request->post());
+                return Json::encode(\yii\widgets\ActiveForm::validate($model));
+            }
+            if($model->signup()){
+                Yii::$app->session->setFlash('success', 'Thank you for registration.');
+                return $this->goHome();
+            }
         }
 
         return $this->render('signup', [
