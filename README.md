@@ -22,7 +22,9 @@ Documentation is at [docs/guide/README.md](docs/guide/README.md).
 [![Build Status](https://travis-ci.org/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-advanced)
 
 <h2>Preparing application</h2>
-<p>Open a console terminal, execute the `init` command and select dev as environment.</p>
+<p>Git clone</p>
+<p>Open a console terminal, execute the `composer install` </p>
+<p>Open a console terminal, execute the `init` (php init) command and select dev as environment.</p>
 <p>Create a new database and adjust the components['db'] configuration in common/config/main-local.php accordingly.</p>
 <p>Open a console terminal, apply migrations with command /path/to/php-bin/php /path/to/yii-application/yii migrate.(in base folder ` php yii migrate `)</p>
 <p>php yii serve --docroot="frontend/web/"</p>
