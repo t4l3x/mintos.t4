@@ -274,7 +274,7 @@ class SiteController extends Controller
 
     public function actionFrequent()
     {
-        $feed = $this->getWholeFeed('https://www.theregister.co.uk/software/headlines.ato')
+        $feed = $this->getWholeFeed('https://www.theregister.co.uk/software/headlines.atom')
             ->getFeedAsArray();
 
         $frequent = new FrequentWords();

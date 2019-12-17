@@ -5,6 +5,7 @@ namespace frontend\components;
 
 
 use Exception;
+use yii\web\UnsupportedMediaTypeHttpException;
 
 class SimpleAtomReader
 {
@@ -21,11 +22,12 @@ class SimpleAtomReader
         return json_decode(json_encode($this->feed), TRUE);
     }
 
-    public function loadXml($url){
-        try{
-            $this->feed = simplexml_load_file($url, "SimpleXMLElement", LIBXML_NOWARNING);
-        }catch (\Exception $e) {
-            throw new Exception('Error on url');
+    public function loadXml($url)
+    {
+        try {
+            $this->feed = simplexml_load_file($url, "SimpleXMLElement");
+        } catch (\Exception $e) {
+            throw new UnsupportedMediaTypeHttpException('Not valid RSS feed');
         }
     }
 
@@ -33,6 +35,7 @@ class SimpleAtomReader
     {
         return $this->feed;
     }
+
 
     //   other codes /
 }
