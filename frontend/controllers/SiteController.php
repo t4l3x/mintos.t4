@@ -1,22 +1,23 @@
 <?php
+
 namespace frontend\controllers;
 
+use common\models\LoginForm;
+use frontend\components\FrequentWords;
+use frontend\components\SimpleAtomReader;
+use frontend\models\ContactForm;
+use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
+use frontend\models\ResetPasswordForm;
+use frontend\models\SignupForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
-use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
-use yii\web\Response;
-use yii\widgets\ActiveForm;
 
 /**
  * Site controller
@@ -39,7 +40,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout','frequent'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -157,11 +158,11 @@ class SiteController extends Controller
     {
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
-            if(Yii::$app->request->isAjax){
+            if (Yii::$app->request->isAjax) {
                 $model->load(Yii::$app->request->post());
                 return Json::encode(\yii\widgets\ActiveForm::validate($model));
             }
-            if($model->signup()){
+            if ($model->signup()) {
                 Yii::$app->session->setFlash('success', 'Thank you for registration.');
                 return $this->goHome();
             }
@@ -225,8 +226,8 @@ class SiteController extends Controller
      * Verify email address
      *
      * @param string $token
-     * @throws BadRequestHttpException
      * @return yii\web\Response
+     * @throws BadRequestHttpException
      */
     public function actionVerifyEmail($token)
     {
@@ -266,4 +267,28 @@ class SiteController extends Controller
             'model' => $model
         ]);
     }
+
+    /**
+     * Simple rss viewer
+     */
+
+    public function actionFrequent()
+    {
+        $feed = $this->getWholeFeed('https://www.theregister.co.uk/software/headlines.ato')
+            ->getFeedAsArray();
+
+        $frequent = new FrequentWords();
+        $feed = $frequent->collectWords($feed)
+            ->excludeWords()
+            ->getMostFrequentWords();
+
+        return $this->render('frequent', ['data' => $feed]);
+    }
+
+    protected function getWholeFeed($url)
+    {
+        return new SimpleAtomReader($url);
+    }
+
+
 }
